@@ -46,15 +46,18 @@ function App() {
 
     // Upload to app clients
     const filteredClients = clients.filter(client => {
-      return client.fields['Has App'] === 'Yes';
+      //return client.fields['Has App'] === 'Yes';
+      return client.fields['Has App'] === 'Yes' && client.fields['Uploaded'] !== '1';
     });
 
     // Set counter based on filteredClients
     $('#counter').html(`<p><span id="finishedUploads">0</span> / ${filteredClients.length}</p>`);
 
     filteredClients.map(client => {
-      // 5 seconds between ajax requests, because limeade is bad and returns 500 errors if we go too fast
-      timer += 5000;
+      // 4 seconds between ajax requests, because limeade is bad and returns 500 errors if we go too fast
+      // These requests average about 2.6-3.4 seconds but we've seen limeade take up to 4.4s, either way this
+      // guarantees concurrent calls will be rare, which seem to be the source of our woes
+      timer += 4000;
       setTimeout(() => {
         uploadChallenge(client);
       }, timer);
@@ -127,6 +130,10 @@ function App() {
         </div>
       `);
 
+    }).fail((request, status, error) => {
+      console.error(request.status);
+      console.error(request.responseText);
+      console.log('Create challenge failed for client ' + client.fields['Limeade e=']);
     });
 
   }
