@@ -1,9 +1,9 @@
 {
-  "name": "hot-topics",
+  "name": "custom-request-loader",
   "version": "1.0.0",
-  "description": "Hot Topics",
+  "description": "Custom Request Loader",
   "main": "index.js",
-  "repository": "https://github.com/dannytpeck/hot-topics",
+  "repository": "https://github.com/dannytpeck/custom-request-loader",
   "scripts": {
     "start": "webpack-dev-server --config ./webpack.config.js --mode development",
     "build": "webpack -p --config ./webpack.config.js --progress --colors"

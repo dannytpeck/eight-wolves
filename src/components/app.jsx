@@ -197,12 +197,12 @@ function App() {
 
       <div className="row">
         <div className="col text-left">
-          <button type="button" className="btn btn-primary" id="uploadButton" onClick={() => uploadChallenge(selectedClient)}>Single Upload Hot Topic</button>
+          <button type="button" className="btn btn-primary" id="uploadButton" onClick={() => uploadChallenge(selectedClient)}>Single Upload</button>
           <img id="spinner" src="images/spinner.svg" />
         </div>
 
         <div className="col text-right">
-          <button type="button" className="btn btn-danger" id="uploadButton" onClick={() => massUpload()}>Mass Upload Hot Topic</button>
+          <button type="button" className="btn btn-danger" id="uploadButton" onClick={() => massUpload()}>Mass Upload</button>
           <img id="spinner" src="images/spinner.svg" />
         </div>
       </div>
