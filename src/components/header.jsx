@@ -4,8 +4,8 @@ function Header() {
   return (
     <header id="header">
       <img src="images/logo.svg" />
-      <h1 className="title">Custom Request Loader</h1>
-      <h3>So Simple, You Just Push a Button</h3>
+      <h1 className="title">Eight Wolves</h1>
+      <h3>Conjure wolves to do your bidding</h3>
     </header>
   );
 }
