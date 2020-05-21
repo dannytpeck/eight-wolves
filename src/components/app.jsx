@@ -47,7 +47,20 @@ function App() {
 
   }, []); // Pass empty array to only run once on mount
 
-  function handleCsvFiles(e) {
+  function handleClientsCsvFiles(e) {
+    console.log(e);
+    var reader = new FileReader();
+    reader.onload = function() {
+      // Do something with the data
+      var clientsJson = csvToJson(reader.result)[0];
+      console.log(clientsJson);
+
+    };
+    // start reading the file. When it is done, calls the onload event defined above.
+    reader.readAsBinaryString(document.querySelector('#csv-clients-input').files[0]); // TODO: replace with new #csv-clients-input and/or #csv-challenges-input
+  }
+
+  function handleChallengesCsvFiles(e) {
     console.log(e);
     var reader = new FileReader();
     reader.onload = function() {
@@ -57,7 +70,7 @@ function App() {
 
     };
     // start reading the file. When it is done, calls the onload event defined above.
-    reader.readAsBinaryString(document.querySelector('#csv-input').files[0]);
+    reader.readAsBinaryString(document.querySelector('#csv-challenges-input').files[0]); // TODO: replace with new #csv-clients-input and/or #csv-challenges-input
   }
 
   // From https://gist.github.com/iwek/7154578#file-csv-to-json-js
@@ -195,9 +208,9 @@ function App() {
       $('#finishedUploads').html(count + 1);
 
       $('#uploadModal .modal-body').append(`
-        <div class="alert alert-success" role="alert">
+        <div className="alert alert-success" role="alert">
           <p>Uploaded Tile for <a href="${client.fields['Domain']}/ControlPanel/RoleAdmin/ViewChallenges.aspx?type=employer" target="_blank"><strong>${client.fields['Account Name']}</strong></a></p>
-          <p class="mb-0"><strong>Challenge Id</strong></p>
+          <p className="mb-0"><strong>Challenge Id</strong></p>
         <p><a href="${client.fields['Domain']}/admin/program-designer/activities/activity/${result.Data.ChallengeId}" target="_blank">${result.Data.ChallengeId}</a></p>
         </div>
       `);
@@ -242,23 +255,36 @@ function App() {
     <div id="app">
       <Header />
 
-      <div className="form-group">
-        <label htmlFor="employerName">EmployerName</label>
-        <select id="employerName" className="form-control custom-select" onChange={selectClient}>
-          <option defaultValue>Select Employer</option>
-          {renderEmployerNames()}
-        </select>
+      <div className="row">
+        <div className="col text-left">
+          <h3>Clients</h3>
+          <label htmlFor="employerName">EmployerName</label>
+          <select id="employerName" className="form-control custom-select" onChange={selectClient}>
+            <option defaultValue>Select Employer</option>
+            {renderEmployerNames()}
+          </select>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col text-left">
+          <p id="csv-clients-import" type="file" name="Import">or Import from CSV</p>
+          <input type="file" id="csv-clients-input" accept="*.csv" onChange={(e) => handleClientsCsvFiles(e)} />
+          <small className="form-text text-muted text-left">Note: file matches on Salesforce Name in Clients Most up to Date.</small>
+        </div>
+      </div>
+
+      <div className="row">
+        <div className="col text-left">
+          <h3>Challenge Content</h3>
+          <p id="csv-challenges-import" type="file" name="Import">Import from CSV</p>
+          <input type="file" id="csv-challenges-input" accept="*.csv" onChange={(e) => handleChallengesCsvFiles(e)} />
+        </div>
       </div>
 
       <div className="row">
         <div className="col text-left">
           <button type="button" className="btn btn-primary" id="uploadButton" onClick={() => uploadChallenge(selectedClient)}>Single Upload</button>
           <img id="spinner" src="images/spinner.svg" />
-        </div>
-
-        <div className="col text-left">
-          <button id="csv-import" type="file" name="Import" className="btn btn-light">Import from CSV</button>
-          <input type="file" id="csv-input" accept="*.csv" onChange={(e) => handleCsvFiles(e)} />
         </div>
       </div>
 
