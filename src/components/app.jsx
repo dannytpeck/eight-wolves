@@ -17,6 +17,15 @@ function App() {
   const [selectedClient, setSelectedClient] = useState(null);
   const [activities, setActivities] = useState([]);
 
+  const [startDate, setStartDate] = useState('2020-04-15');
+  const [endDate, setEndDate] = useState('2020-12-01');
+
+  const [imageUrl, setImageUrl] = useState('https://images.limeade.com/PDW/805d6a9d-186e-4462-8fe2-ca97a478ffca-large.jpg');
+  const [title, setTitle] = useState('Uploaded from Eight Wolves');
+  const [activityText, setActivityText] = useState('test the upload');
+  const [shortDescription, setShortDescription] = useState('Test upload from Eight Wolves.');
+  const [longDescription, setLongDescription] =useState('<p>So many wolves.</p>');
+
   const [clients, dispatch] = React.useReducer(
     clientsReducer,
     [] // initial clients
@@ -37,6 +46,78 @@ function App() {
     });
 
   }, []); // Pass empty array to only run once on mount
+
+  function handleCsvFiles(e) {
+    console.log(e);
+    var reader = new FileReader();
+    reader.onload = function() {
+      // Do something with the data
+      var challengeJson = csvToJson(reader.result)[0];
+      console.log(challengeJson);
+
+    };
+    // start reading the file. When it is done, calls the onload event defined above.
+    reader.readAsBinaryString(document.querySelector('#csv-input').files[0]);
+  }
+
+  // From https://gist.github.com/iwek/7154578#file-csv-to-json-js
+  // Convert csv string to JSON
+  function csvToJson(csv) {
+    var lines = csv.split('\n');
+    var result = [];
+    var headers = lines[0].split(',');
+
+    for (var i=1; i<lines.length; i++) {
+      var obj = {};
+
+      var row = lines[i],
+        queryIdx = 0,
+        startValueIdx = 0,
+        idx = 0;
+
+      if (row.trim() === '') {
+        continue;
+      }
+
+      while (idx < row.length) {
+        /* if we meet a double quote we skip until the next one */
+        var c = row[idx];
+
+        if (c === '"') {
+          do {
+            c = row[++idx];
+          } while (c !== '"' && idx < row.length - 1);
+        }
+
+        if (c === ',' || /* handle end of line with no comma */ idx === row.length - 1) {
+          /* we've got a value */
+          var value = row.substr(startValueIdx, idx - startValueIdx).trim();
+
+          /* skip first double quote */
+          if (value[0] === '"') {
+            value = value.substr(1);
+          }
+          /* skip last comma */
+          if (value[value.length - 1] === ',') {
+            value = value.substr(0, value.length - 1);
+          }
+          /* skip last double quote */
+          if (value[value.length - 1] === '"') {
+            value = value.substr(0, value.length - 1);
+          }
+
+          var key = headers[queryIdx++];
+          obj[key] = value;
+          startValueIdx = idx + 1;
+        }
+
+        ++idx;
+      }
+
+      result.push(obj);
+    }
+    return result;
+  }
 
   function massUpload() {
     // Open the modal
@@ -68,15 +149,6 @@ function App() {
     // Open the modal
     $('#uploadModal').modal();
 
-    const startDate = '2020-04-15';
-    const endDate = '2020-12-01';
-
-    const imageUrl = 'https://images.limeade.com/PDW/6fad1d13-2edd-45f2-9262-30d31bcccf13-large.jpg';
-    const title = 'COVID-19 Resources on the Aduro App';
-    const activityText = 'download the Aduro app';
-    const shortDescription = 'Download the Aduro App for timely resources and tools to help in the midst of uncertainty surrounding COVID-19.';
-    const longDescription = '<p>Download the Aduro app to access new learning sessions each week that provide tools and resources for all areas of life and well-being to help you navigate the changes and build resilience in the midst of uncertain times.</p><p>When we\'re up against change, uncertainty, and stress, resilience is the key to navigate life and emerge with more happiness and satisfaction. Each week, new learning sessions are delivered straight to your ADURO app so that you can access it wherever you are, right when you need it.</p><p>&nbsp;</p><p>Download the Aduro App via <a style="color: #4f81bd;" href="https://apps.apple.com/us/app/aduro/id1199288368?mt=8" target="_blank" rel="noopener">this link</a> for Apple products.</p><p>Download the Aduro App via <a style="color: #4f81bd;" href="https://play.google.com/store/apps/details?id=com.aduro.amp&amp;hl=en_US" target="_blank" rel="noopener">this link</a> for android users.</p>';
-
     const data = {
       'AboutChallenge': longDescription,
       'ActivityReward': {
@@ -91,7 +163,7 @@ function App() {
       'ChallengeType': 'OneTimeEvent',
       'Dimensions': [],
       'DisplayInProgram': startDate === moment().format('YYYY-MM-DD') ? true : false,  // sets true if the challenge starts today
-      'DisplayPriority': 100,
+      'DisplayPriority': '',
       'EndDate': endDate,
       'EventCode': '',
       'Frequency': 'None',
@@ -184,9 +256,9 @@ function App() {
           <img id="spinner" src="images/spinner.svg" />
         </div>
 
-        <div className="col text-right">
-          <button type="button" className="btn btn-danger" id="uploadButton" onClick={() => massUpload()}>Mass Upload</button>
-          <img id="spinner" src="images/spinner.svg" />
+        <div className="col text-left">
+          <button id="csv-import" type="file" name="Import" className="btn btn-light">Import from CSV</button>
+          <input type="file" id="csv-input" accept="*.csv" onChange={(e) => handleCsvFiles(e)} />
         </div>
       </div>
 
