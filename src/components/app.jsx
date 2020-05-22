@@ -17,6 +17,46 @@ function App() {
   const [selectedClient, setSelectedClient] = useState(null);
   const [activities, setActivities] = useState([]);
 
+  const [startDate, setStartDate] = useState('2020-05-22');
+  const [endDate, setEndDate] = useState('2020-07-01');
+
+  const [challengeId, setChallengeId] = useState(null); // adding this in case we use the app for updating tiles. Could be fancy.
+  const [imageUrl, setImageUrl] = useState('https://images.limeade.com/PDW/805d6a9d-186e-4462-8fe2-ca97a478ffca-large.jpg');
+  const [title, setTitle] = useState('Uploaded from Eight Wolves');
+  const [activityText, setActivityText] = useState('test the upload');
+  const [shortDescription, setShortDescription] = useState('Test upload from Eight Wolves.');
+  const [longDescription, setLongDescription] = useState('<p>So many wolves.</p>');
+
+  // TODO: add remaining state variables
+  const [allowSelfReport, setAllowSelfReport] = useState(0);
+  const [challengeTarget, setChallengeTarget] = useState(1);
+  const [challengeType, setChallengeType] = useState('OneTimeEvent');
+  const [displayPriority, setDisplayPriority] = useState(null);
+  const [enableDeviceTracking, setEnableDeviceTracking] = useState(0);
+  const [eventCode, setEventCode] = useState(null); // adding this in case we ever need it
+
+  const [isFeatured, setIsFeatured] = useState(0);
+  const [isWeekly, setIsWeekly] = useState(0);
+
+  const [isTeamChallenge, setIsTeamChallenge] = useState(0);
+  const [minTeamSize, setMinTeamSize] = useState('');
+  const [maxTeamSize, setMaxTeamSize] = useState('');
+
+  const [partnerId, setPartnerId] = useState(0);
+
+  const [pointValue, setPointValue] = useState(0);
+
+  // Targeting state values
+  const [subgroup, setSubgroup] = useState(null);
+  const [field1, setField1] = useState(null);
+  const [field1Value, setField1Value] = useState(null);
+  const [field2, setField2] = useState(null);
+  const [field2Value, setField2Value] = useState(null);
+  const [field3, setField3] = useState(null);
+  const [field3Value, setField3Value] = useState(null);
+
+
+
   const [clients, dispatch] = React.useReducer(
     clientsReducer,
     [] // initial clients
@@ -37,6 +77,152 @@ function App() {
     });
 
   }, []); // Pass empty array to only run once on mount
+
+  function handleClientsCsvFiles(e) {
+    console.log(e);
+    var reader = new FileReader();
+    reader.onload = function() {
+      // Do something with the data
+      var clientsJson = csvToJson(reader.result)[0];
+      console.log(clientsJson);
+
+      // TODO: parse the clients csv and update state
+
+      // TODO: fix issue where it only parses first row in csv
+
+    };
+    // start reading the file. When it is done, calls the onload event defined above.
+    reader.readAsBinaryString(document.querySelector('#csv-clients-input').files[0]);
+  }
+
+  function handleChallengesCsvFiles(e) {
+    console.log(e);
+    var reader = new FileReader();
+    reader.onload = function() {
+      // Do something with the data
+      var challengesJson = csvToJson(reader.result)[0];
+      console.log(challengesJson);
+
+      // parse the challenges csv and update the state values
+      setChallengeId(challengesJson.ChallengeId);
+      setChallengeType(challengesJson.ChallengeType);
+      setIsWeekly(challengesJson.IsWeekly);
+      // skipping WinStrategy since the upload doesn't seem to need it
+      setChallengeTarget(challengesJson.Target);
+      setActivityText(challengesJson.Activity);
+      setTitle(challengesJson.ChallengeName);
+      setDisplayPriority(challengesJson.DisplayPriority);
+      setStartDate(challengesJson.StartDate);
+      setEndDate(challengesJson.EndDate);
+      setShortDescription(challengesJson.ShortDescription);
+      setLongDescription(challengesJson.MoreInformation);
+      setImageUrl(challengesJson.ImageUrl);
+      // skipping ShowInProgram since we determine it during upload
+      // skipping RewardType because what is it even
+      setPointValue(challengesJson.Reward);
+      // skipping Dimensions becasue eff 'em
+      // skipping Leaderboard
+      setEnableDeviceTracking(challengesJson.EnableDeviceTracking);
+      setAllowSelfReport(challengesJson.AllowSelfReporting);
+      // skipping DeviceTrackingUnits, not sure where it fits in the upload
+      setIsTeamChallenge(challengesJson.IsTeamChallenge);
+      setMinTeamSize(challengesJson.MinTeamSize);
+      setMaxTeamSize(challengesJson.MaxTeamSize);
+      setSubgroup(challengesJson.Subgroup);
+      setField1(challengesJson.Field1);
+      setField1Value(challengesJson.Field1Value);
+      setField2(challengesJson.Field2);
+      setField2Value(challengesJson.Field2Value);
+      setField3(challengesJson.Field3);
+      setField3Value(challengesJson.Field3Value);
+      // skipping Appearance
+      setPartnerId(challengesJson.IntegrationPartnerId);
+      // skipping ButtonText since we determine it during upload
+      // skipping TargetUrl since we determine it during upload
+      setEventCode(challengesJson.EventCode);
+      // skipping ShowExtendedDescription since we determine it during upload
+      // skipping ActivityTemplateId, what even is that
+      setIsFeatured(challengesJson.IsFeatured);
+      // skippingFeaturedDescription since we determine it during upload
+      // skipping FeaturedImageUrl since we determine it during upload
+
+    };
+    // start reading the file. When it is done, calls the onload event defined above.
+    reader.readAsBinaryString(document.querySelector('#csv-challenges-input').files[0]);
+  }
+
+  // From https://gist.github.com/iwek/7154578#file-csv-to-json-js
+  // Convert csv string to JSON
+  function csvToJson(csv) {
+    var lines = csv.split('\n');
+    var result = [];
+    var headers = lines[0].split(',');
+
+    for (var i=1; i<lines.length; i++) {
+      var obj = {};
+
+      var row = lines[i],
+        queryIdx = 0,
+        startValueIdx = 0,
+        idx = 0;
+
+      if (row.trim() === '') {
+        continue;
+      }
+
+      while (idx < row.length) {
+        /* if we meet a double quote we skip until the next one */
+        var c = row[idx];
+
+        if (c === '"') {
+          do {
+            c = row[++idx];
+          } while (c !== '"' && idx < row.length - 1);
+        }
+
+        if (c === ',' || /* handle end of line with no comma */ idx === row.length - 1) {
+          /* we've got a value */
+          var value = row.substr(startValueIdx, idx - startValueIdx).trim();
+
+          /* skip first double quote */
+          if (value[0] === '"') {
+            value = value.substr(1);
+          }
+          /* skip last comma */
+          if (value[value.length - 1] === ',') {
+            value = value.substr(0, value.length - 1);
+          }
+          /* skip last double quote */
+          if (value[value.length - 1] === '"') {
+            value = value.substr(0, value.length - 1);
+          }
+
+          var key = headers[queryIdx++];
+          obj[key] = value;
+          startValueIdx = idx + 1;
+        }
+
+        ++idx;
+      }
+
+      result.push(obj);
+    }
+    return result;
+  }
+
+  function sanitize(code) {
+    let sanitized = code
+      .replace(/\r?\n|\r/g, ' ')     // Strip out carriage returns and newlines
+      .replace(/\u2018/g, '\'')      // Left single quote
+      .replace(/\u2019/g, '\'')      // Right single quote
+      .replace(/\u201C/g, '"')       // Left double quote
+      .replace(/\u201D/g, '"')       // Right double quote
+      .replace(/\u2026/g, '...')     // Ellipsis
+      .replace(/\u2013/g, '&ndash;') // Long dash
+      .replace(/\u2014/g, '&mdash;') // Longer dash
+      .replace(/\u00A9/g, '&copy;');  // Copyright symbol
+    return sanitized;
+  }
 
   function massUpload() {
     // Open the modal
@@ -68,43 +254,109 @@ function App() {
     // Open the modal
     $('#uploadModal').modal();
 
-    const startDate = '2020-04-15';
-    const endDate = '2020-12-01';
+    let frequency = '';
+    if (enableDeviceTracking === 1) {
+      frequency = 'Daily';
+    } else if (isWeekly === 1) {
+      frequency = 'Weekly'; // this order is intentional, since Weekly Steps have Frequency of Weekly
+    } else {
+      frequency = 'None';
+    }
 
-    const imageUrl = 'https://images.limeade.com/PDW/6fad1d13-2edd-45f2-9262-30d31bcccf13-large.jpg';
-    const title = 'COVID-19 Resources on the Aduro App';
-    const activityText = 'download the Aduro app';
-    const shortDescription = 'Download the Aduro App for timely resources and tools to help in the midst of uncertainty surrounding COVID-19.';
-    const longDescription = '<p>Download the Aduro app to access new learning sessions each week that provide tools and resources for all areas of life and well-being to help you navigate the changes and build resilience in the midst of uncertain times.</p><p>When we\'re up against change, uncertainty, and stress, resilience is the key to navigate life and emerge with more happiness and satisfaction. Each week, new learning sessions are delivered straight to your ADURO app so that you can access it wherever you are, right when you need it.</p><p>&nbsp;</p><p>Download the Aduro App via <a style="color: #4f81bd;" href="https://apps.apple.com/us/app/aduro/id1199288368?mt=8" target="_blank" rel="noopener">this link</a> for Apple products.</p><p>Download the Aduro App via <a style="color: #4f81bd;" href="https://play.google.com/store/apps/details?id=com.aduro.amp&amp;hl=en_US" target="_blank" rel="noopener">this link</a> for android users.</p>';
+    // most of the time, Activity Type is the activityText, unless it's a weekly units non-device challenge
+    let activityType = '';
+    if (enableDeviceTracking === 1 && isWeekly === 1) {
+      activityType = '';
+    } else {
+      activityType = activityText;
+    }
+    
+    let amountUnit = 'times';
+    switch (enableDeviceTracking) {
+      case 1:
+        if (isWeekly === 0) {
+          amountUnit = 'steps';
+        } else if (isWeekly === 1) {
+          amountUnit = activityText;
+        }
+        break;
+      case 0:
+        amountUnit = 'times';
+        break;
+    }
+
+    // prepping for splitting tags for upload
+    let tagValues1 = [];
+    let tagValues2 = [];
+    let tagValues3 = [];
+
+    // conditionally setting the tags in case there are fewer than 3 targeting columns
+    let tags = [];
+    function makeTags() {
+      field1 ? tags.push({
+        'TagName': field1 ? field1 : '',
+        'TagValues':
+          field1Value ? tagValues1.concat(field1Value.split('|').map(tag => tag.trim())) : '' // splitting tags on the | like Limeade, also trimming out whitespace just in case
+      }) : null;
+      field2 ? tags.push({
+        'TagName': field2 ? field2 : '',
+        'TagValues':
+          field2Value ? tagValues2.concat(field2Value.split('|').map(tag => tag.trim())) : ''
+      }) : null;
+      field3 ? tags.push({
+        'TagName': field3 ? field3 : '',
+        'TagValues':
+          field3Value ? tagValues3.concat(field3Value.split('|').map(tag => tag.trim())) : ''
+      }) : null;
+      return tags;
+    }
 
     const data = {
-      'AboutChallenge': longDescription,
+      'AboutChallenge': sanitize(longDescription),
       'ActivityReward': {
         'Type': 'IncentivePoints',
-        'Value': '0'
+        'Value': pointValue
       },
-      'ActivityType': activityText,
-      'AmountUnit': '',
+      'ActivityType': activityType, // Activity in csv, except for definition above
+      'AmountUnit': amountUnit,
+      'ButtonText': partnerId === 1 ? 'CLOSE' : '',
       'ChallengeLogoThumbURL': imageUrl,
       'ChallengeLogoURL': imageUrl,
-      'ChallengeTarget': 1,
-      'ChallengeType': 'OneTimeEvent',
+      'ChallengeTarget': challengeTarget, // Target in csv
+      'ChallengeType': challengeType, // ChallengeType in csv
       'Dimensions': [],
       'DisplayInProgram': startDate === moment().format('YYYY-MM-DD') ? true : false,  // sets true if the challenge starts today
-      'DisplayPriority': 100,
+      'DisplayPriority': displayPriority,
       'EndDate': endDate,
-      'EventCode': '',
-      'Frequency': 'None',
-      'IsDeviceEnabled': false,
-      'IsFeatured': null,
-      'IsSelfReportEnabled': true,
-      'IsTeamChallenge': false,
-      'Name': title,
-      'ShortDescription': shortDescription,
-      'ShowExtendedDescription': false,
-      'ShowWeeklyCalendar': false,
+      'EventCode': eventCode,
+      'Frequency': frequency,
+      'IsDeviceEnabled': enableDeviceTracking === 1 ? true : false, // EnableDeviceTracking in csv
+      'IsFeatured': isFeatured === 1 ? true : false, // isFeatured in csv
+      'FeaturedData': {
+        'Description': isFeatured === 1 ? shortDescription : false,
+        'ImageUrl': isFeatured === 1 ? imageUrl : false
+      },
+      'IsSelfReportEnabled': allowSelfReport === 1 ? true : false,
+      'IsTeamChallenge': isTeamChallenge,
+      'Name': title, // ChallengeName in csv
+      'PartnerId': partnerId, // IntegrationPartnerId in csv
+      'ShortDescription': sanitize(shortDescription),
+      'ShowExtendedDescription': partnerId === 1 ? true : false,
+      'ShowWeeklyCalendar': false, // not sure what this does, CTRT has this as false
       'StartDate': startDate,
-      'TeamSize': null
+      'TargetUrl': partnerId === 1 ? '/Home?sametab=true' : '',
+      // trying to check for targeting by seeing if there are values in subgroup or field1 name
+      'Targeting': subgroup || field1 ? [
+        {
+          'SubgroupId': subgroup ? subgroup : '0', // if no subgroup, use 0 aka none
+          'Name': '', // let's hope this is optional since How would we know the Subgroup Name?
+          'IsImplicit': field1 ? true : false, // not sure what this does. Seems to be true for tags and false for subgroups.
+          'IsPHI': false,
+          'Tags': 
+            field1 ? makeTags() : null
+        }
+      ] : [], // if no targeting, use an empty array
+      'TeamSize': isTeamChallenge === 1 ? { MaxTeamSize: maxTeamSize, MinTeamSize: minTeamSize } : null
     };
 
     $.ajax({
@@ -123,17 +375,24 @@ function App() {
       $('#finishedUploads').html(count + 1);
 
       $('#uploadModal .modal-body').append(`
-        <div class="alert alert-success" role="alert">
+        <div className="alert alert-success" role="alert">
           <p>Uploaded Tile for <a href="${client.fields['Domain']}/ControlPanel/RoleAdmin/ViewChallenges.aspx?type=employer" target="_blank"><strong>${client.fields['Account Name']}</strong></a></p>
-          <p class="mb-0"><strong>Challenge Id</strong></p>
+          <p className="mb-0"><strong>Challenge Id</strong></p>
         <p><a href="${client.fields['Domain']}/admin/program-designer/activities/activity/${result.Data.ChallengeId}" target="_blank">${result.Data.ChallengeId}</a></p>
         </div>
       `);
 
-    }).fail((request, status, error) => {
+    }).fail((xhr, request, status, error) => {
+      console.error(xhr.responseText);
       console.error(request.status);
       console.error(request.responseText);
       console.log('Create challenge failed for client ' + client.fields['Limeade e=']);
+      $('#uploadModal .modal-body').html(`
+          <div class="alert alert-danger" role="alert">
+            <p>Error uploading ${title} for <strong>${client.fields['Account Name']}</strong></p>
+            <p>${xhr.responseText}</p>
+          </div>
+        `);
     });
 
   }
@@ -170,22 +429,40 @@ function App() {
     <div id="app">
       <Header />
 
-      <div className="form-group">
-        <label htmlFor="employerName">EmployerName</label>
-        <select id="employerName" className="form-control custom-select" onChange={selectClient}>
-          <option defaultValue>Select Employer</option>
-          {renderEmployerNames()}
-        </select>
+      <div className="row mb-1">
+        <div className="col text-left">
+          <h3>Clients</h3>
+          <label htmlFor="employerName">EmployerName</label>
+          <select id="employerName" className="form-control custom-select" onChange={selectClient}>
+            <option defaultValue>Select Employer</option>
+            {renderEmployerNames()}
+          </select>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col text-left">
+          <p id="csv-clients-import" type="file" name="Import">or Import from CSV</p>
+          <input type="file" id="csv-clients-input" accept="*.csv" onChange={(e) => handleClientsCsvFiles(e)} />
+          <small className="form-text text-muted text-left">Note: file matches on Salesforce Name in Clients Most up to Date.</small>
+        </div>
+      </div>
+
+      <div className="row mb-1">
+        <div className="col text-left">
+          <h3>Challenge Content</h3>
+          <p id="csv-challenges-import" type="file" name="Import">Import from CSV</p>
+          <input type="file" id="csv-challenges-input" accept="*.csv" onChange={(e) => handleChallengesCsvFiles(e)} />
+        </div>
+      </div>
+      <div className="row">
+        <div className="col text-left">
+          {/* TODO: add challenge form inputs here */}
+        </div>
       </div>
 
       <div className="row">
         <div className="col text-left">
           <button type="button" className="btn btn-primary" id="uploadButton" onClick={() => uploadChallenge(selectedClient)}>Single Upload</button>
-          <img id="spinner" src="images/spinner.svg" />
-        </div>
-
-        <div className="col text-right">
-          <button type="button" className="btn btn-danger" id="uploadButton" onClick={() => massUpload()}>Mass Upload</button>
           <img id="spinner" src="images/spinner.svg" />
         </div>
       </div>
