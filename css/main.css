@@ -2,6 +2,10 @@ body {
   color: #554E49;
 }
 
+.row {
+  margin-bottom: 3em;
+}
+
 #header {
   text-align: center;
   margin: 2em 0;
