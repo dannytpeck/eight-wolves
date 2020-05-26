@@ -8,13 +8,14 @@ import Header from './header';
 import Footer from './footer';
 import Modal from './modal';
 
+import csvToJson from '../helpers/csv_to_json';
+
 function clientsReducer(state, action) {
   return [...state, ...action];
 }
 
 /* globals $ */
 function App() {
-  const [selectedClient, setSelectedClient] = useState(null);
   const [clientsFromCsv, setClientsFromCsv] = useState(null);
 
   const [clients, dispatch] = React.useReducer(
@@ -38,155 +39,46 @@ function App() {
 
   }, []); // Pass empty array to only run once on mount
 
-  function handleClientsCsvFiles(e) {
-    let reader = new FileReader();
-    reader.onload = function() {
-      // Parse the client csv and update state
-      let clientsJson = csvToJson(reader.result);
-      setClientsFromCsv(clientsJson);
-    };
-    // Start reading the file. When it is done, calls the onload event defined above.
-    reader.readAsBinaryString(e.target.files[0]);
-  }
-
-  // From https://gist.github.com/iwek/7154578#file-csv-to-json-js
-  // Convert csv string to JSON
-  function csvToJson(csv) {
-    var lines = csv.split('\n');
-    var result = [];
-    var headers = lines[0].split(',');
-
-    for (var i=1; i<lines.length; i++) {
-      var obj = {};
-
-      var row = lines[i],
-        queryIdx = 0,
-        startValueIdx = 0,
-        idx = 0;
-
-      if (row.trim() === '') {
-        continue;
-      }
-
-      while (idx < row.length) {
-        /* if we meet a double quote we skip until the next one */
-        var c = row[idx];
-
-        if (c === '"') {
-          do {
-            c = row[++idx];
-          } while (c !== '"' && idx < row.length - 1);
-        }
-
-        if (c === ',' || /* handle end of line with no comma */ idx === row.length - 1) {
-          /* we've got a value */
-          var value = row.substr(startValueIdx, idx - startValueIdx).trim();
-
-          /* skip first double quote */
-          if (value[0] === '"') {
-            value = value.substr(1);
-          }
-          /* skip last comma */
-          if (value[value.length - 1] === ',') {
-            value = value.substr(0, value.length - 1);
-          }
-          /* skip last double quote */
-          if (value[value.length - 1] === '"') {
-            value = value.substr(0, value.length - 1);
-          }
-
-          var key = headers[queryIdx++];
-          obj[key] = value;
-          startValueIdx = idx + 1;
-        }
-
-        ++idx;
-      }
-
-      result.push(obj);
-    }
-    return result;
-  }
-
-  function massUpload() {
-    // Open the modal
-    $('#uploadModal').modal();
-
-    let timer = 0;
-
-    const accountNamesList = clientsFromCsv.map(client => client['Account: Account Name']);
-
-    // Filter clients by the list of account names in the user uploaded CSV
-    const filteredClients = clients.filter(client => {
-      return accountNamesList.includes(client.fields['Salesforce Name']);
-    });
-
-    console.log(filteredClients);
-
-    // Set counter based on filteredClients
-    $('#counter').html(`<p><span id="finishedUploads">0</span> / ${filteredClients.length}</p>`);
-
-    // filteredClients.map(client => {
-    //   // 4 seconds between ajax requests, because limeade is bad and returns 500 errors if we go too fast
-    //   // These requests average about 2.6-3.4 seconds but we've seen limeade take up to 4.4s, either way this
-    //   // guarantees concurrent calls will be rare, which seem to be the source of our woes
-    //   timer += 4000;
-    //   setTimeout(() => {
-    //     uploadChallenge(client);
-    //   }, timer);
-    // });
-  }
-
   function uploadChallenge(client) {
-    // Open the modal
-    $('#uploadModal').modal();
+    const employerName = client.fields['Limeade e='];
+
+    const startDate = '2020-05-04';
+    const endDate = '2020-05-31';
+    const imageUrl = 'https://images.limeade.com/PDW/4db33758-07f3-434c-9045-da0b5d34c8b7-large.jpg';
+    const title = 'Hot Topic: Balancing Act';
+    const activityText = 'listen to the latest Hot Topic podcast';
+    const shortDescription = 'Being a parent is hard work. Recently, many parents have been finding themselves in unfamiliar territory. Not only are they shifting to work from home but are also trying to support their kids\' education at home.';
+
+    const surveyId = '78c9c8f4-f0b1-4dc8-931b-fe1495b38af8';
 
     const data = {
-      'AboutChallenge': longDescription,
+      'AboutChallenge': '',
       'ActivityReward': {
         'Type': 'IncentivePoints',
-        'Value': pointValue
+        'Value': '0'
       },
-      'ActivityType': activityType, // Activity in csv, except for definition above
-      'AmountUnit': amountUnit,
-      'ButtonText': partnerId === 1 ? 'CLOSE' : '',
+      'ActivityType': activityText,
+      'AmountUnit': '',
       'ChallengeLogoThumbURL': imageUrl,
       'ChallengeLogoURL': imageUrl,
-      'ChallengeTarget': challengeTarget, // Target in csv
-      'ChallengeType': challengeType, // ChallengeType in csv
+      'ChallengeTarget': 1,
+      'ChallengeType': 'OneTimeEvent',
       'Dimensions': [],
       'DisplayInProgram': startDate === moment().format('YYYY-MM-DD') ? true : false,  // sets true if the challenge starts today
-      'DisplayPriority': displayPriority,
+      'DisplayPriority': 100,
       'EndDate': endDate,
-      'EventCode': eventCode,
-      'Frequency': frequency,
-      'IsDeviceEnabled': enableDeviceTracking === 1 ? true : false, // EnableDeviceTracking in csv
-      'IsFeatured': isFeatured === 1 ? true : false, // isFeatured in csv
-      'FeaturedData': {
-        'Description': isFeatured === 1 ? shortDescription : false,
-        'ImageUrl': isFeatured === 1 ? imageUrl : false
-      },
-      'IsSelfReportEnabled': allowSelfReport === 1 ? true : false,
-      'IsTeamChallenge': isTeamChallenge,
-      'Name': title, // ChallengeName in csv
-      'PartnerId': partnerId, // IntegrationPartnerId in csv
+      'EventCode': '',
+      'Frequency': 'None',
+      'IsDeviceEnabled': false,
+      'IsFeatured': null,
+      'IsSelfReportEnabled': true,
+      'IsTeamChallenge': false,
+      'Name': title,
       'ShortDescription': shortDescription,
-      'ShowExtendedDescription': partnerId === 1 ? true : false,
-      'ShowWeeklyCalendar': false, // not sure what this does, CTRT has this as false
+      'ShowExtendedDescription': false,
+      'ShowWeeklyCalendar': false,
       'StartDate': startDate,
-      'TargetUrl': partnerId === 1 ? '/Home?sametab=true' : '',
-      // trying to check for targeting by seeing if there are values in subgroup or field1 name
-      'Targeting': subgroup || field1 ? [
-        {
-          'SubgroupId': subgroup ? subgroup : '0', // if no subgroup, use 0 aka none
-          'Name': '', // let's hope this is optional since How would we know the Subgroup Name?
-          'IsImplicit': field1 ? true : false, // not sure what this does. Seems to be true for tags and false for subgroups.
-          'IsPHI': false,
-          'Tags':
-            field1 ? makeTags() : null
-        }
-      ] : [], // if no targeting, use an empty array
-      'TeamSize': isTeamChallenge === 1 ? { MaxTeamSize: maxTeamSize, MinTeamSize: minTeamSize } : null
+      'TeamSize': null
     };
 
     $.ajax({
@@ -199,48 +91,65 @@ function App() {
       },
       contentType: 'application/json; charset=utf-8'
     }).done((result) => {
+      const surveyUrl = `/api/Redirect?url=https%3A%2F%2Fheartbeat.adurolife.com%2Fapp%2Fsurvey%2F%3Fs%3D${surveyId}%26q1%3D${result.Data.ChallengeId}%26q4%3D%5Bparticipantcode%5D%26q5%3D%5Be%5D`;
 
-      // Advance the counter
-      let count = Number($('#finishedUploads').html());
-      $('#finishedUploads').html(count + 1);
+      $.ajax({
+        url: 'https://api.limeade.com/api/admin/activity/' + result.Data.ChallengeId,
+        type: 'PUT',
+        dataType: 'json',
+        data: JSON.stringify({
+          'AboutChallenge': `<p>In this month's Hot Topic podcast, our host Coach Molly Pracht and mom and entrepreneur Kim Murgatroyd share some unique insight into home education, including how to build a routine that is fun and can help keep stress low for your whole family.</p><hr size="1" /><h2 style="text-align: center;">Listen to the episode <a href="https://vimeo.com/adurolife/review/408170538/2a86f6c89b" target="_blank" rel="noopener"><span style="text-decoration: underline;">HERE</span></a>.</h2><hr size="1" /><p style="text-align: center;">After the podcast, be sure to fill out <a href="${surveyUrl}" target="_blank" rel="noopener"><span style="text-decoration: underline;"><strong>the survey</strong></span></a>.<br />We'd love to hear from you!</p>`
+        }),
+        headers: {
+          Authorization: 'Bearer ' + client.fields['LimeadeAccessToken']
+        },
+        contentType: 'application/json; charset=utf-8'
+      }).done((result) => {
 
-      $('#uploadModal .modal-body').append(`
-        <div className="alert alert-success" role="alert">
-          <p>Uploaded Tile for <a href="${client.fields['Domain']}/ControlPanel/RoleAdmin/ViewChallenges.aspx?type=employer" target="_blank"><strong>${client.fields['Account Name']}</strong></a></p>
-          <p className="mb-0"><strong>Challenge Id</strong></p>
-        <p><a href="${client.fields['Domain']}/admin/program-designer/activities/activity/${result.Data.ChallengeId}" target="_blank">${result.Data.ChallengeId}</a></p>
-        </div>
-      `);
+        // Change row to green on success
+        $('#' + employerName.replace(/\s*/g, '')).addClass('bg-success text-white');
+        $('#' + employerName.replace(/\s*/g, '') + ' .challenge-id').html(`<a href="${client.fields['Domain']}/admin/program-designer/activities/activity/${result.Data.ChallengeId}" target="_blank">${result.Data.ChallengeId}</a>`);
 
-    }).fail((xhr, request, status, error) => {
-      console.error(xhr.responseText);
+      }).fail((request, status, error) => {
+        $('#' + employerName.replace(/\s*/g, '')).addClass('bg-danger text-white');
+        console.error(request.status);
+        console.error(request.responseText);
+        console.log('Update challenge failed for client', client.fields['Limeade e=']);
+      });
+
+    }).fail((request, status, error) => {
+      $('#' + employerName.replace(/\s*/g, '')).addClass('bg-danger text-white');
       console.error(request.status);
       console.error(request.responseText);
       console.log('Create challenge failed for client ' + client.fields['Limeade e=']);
-      $('#uploadModal .modal-body').html(`
-          <div class="alert alert-danger" role="alert">
-            <p>Error uploading ${title} for <strong>${client.fields['Account Name']}</strong></p>
-            <p>${xhr.responseText}</p>
-          </div>
-        `);
     });
 
   }
 
-  function selectClient(e) {
-    clients.forEach((client) => {
-      if (client.fields['Limeade e='] === e.target.value) {
-        setSelectedClient(client);
-      }
-    });
+  function handleClientsCsvFiles(e) {
+    let reader = new FileReader();
+    reader.onload = function() {
+      // Parse the client csv and update state
+      const clientsJson = csvToJson(reader.result);
+      setClientsFromCsv(clientsJson);
+    };
+    // Start reading the file. When it is done, calls the onload event defined above.
+    reader.readAsBinaryString(e.target.files[0]);
   }
 
-  function renderEmployerNames() {
-    const sortedClients = [...clients];
+  function renderClients() {
+    const accountNamesList = clientsFromCsv.map(client => client['Account: Account Name']);
+
+    // Filter clients by the list of account names in the user uploaded CSV
+    const filteredClients = clients.filter(client => {
+      return accountNamesList.includes(client.fields['Salesforce Name']);
+    });
+
+    const sortedClients = [...filteredClients];
 
     sortedClients.sort((a, b) => {
-      const nameA = a.fields['Limeade e='].toLowerCase();
-      const nameB = b.fields['Limeade e='].toLowerCase();
+      const nameA = a.fields['Salesforce Name'].toLowerCase();
+      const nameB = b.fields['Salesforce Name'].toLowerCase();
       if (nameA < nameB) {
         return -1;
       }
@@ -251,44 +160,45 @@ function App() {
     });
 
     return sortedClients.map((client) => {
-      return <option key={client.id}>{client.fields['Limeade e=']}</option>;
+      const employerName = client.fields['Limeade e='];
+
+      return (
+        <tr id={employerName.replace(/\s*/g, '')} key={employerName}>
+          <td>
+            <a href={client.fields['Domain'] + '/ControlPanel/RoleAdmin/ViewChallenges.aspx?type=employer'} target="_blank">{client.fields['Salesforce Name']}</a>
+          </td>
+          <td className="challenge-id"></td>
+          <td>
+            <button type="button" className="btn btn-primary" onClick={() => uploadChallenge(client)}>Upload</button>
+          </td>
+        </tr>
+      );
     });
+
   }
 
   return (
     <div id="app">
       <Header />
 
-      <div className="row mb-1">
-        <div className="col text-left">
-          <h3>Clients</h3>
-          <label htmlFor="employerName">EmployerName</label>
-          <select id="employerName" className="form-control custom-select" onChange={selectClient}>
-            <option defaultValue>Select Employer</option>
-            {renderEmployerNames()}
-          </select>
-        </div>
-      </div>
-      <div className="row">
-        <div className="col text-left">
-          <p id="csv-clients-import" type="file" name="Import">or Import from CSV</p>
-          <input type="file" id="csv-clients-input" accept="*.csv" onChange={(e) => handleClientsCsvFiles(e)} />
-          <small className="form-text text-muted text-left">Note: file matches on Salesforce Name in Clients Most up to Date.</small>
-        </div>
+      <div className="form-group">
+        <label htmlFor="csvClientsInput">Import from CSV</label>
+        <input type="file" className="form-control-file" id="csvClientsInput" accept="*.csv" onChange={(e) => handleClientsCsvFiles(e)} />
+        <small className="form-text text-muted text-left">Note: file matches on Salesforce Name in Clients Most up to Date.</small>
       </div>
 
-      <div className="row">
-        <div className="col text-left">
-          <button type="button" className="btn btn-primary" id="uploadButton" onClick={() => uploadChallenge(selectedClient)}>Single Upload</button>
-          <img id="spinner" src="images/spinner.svg" />
-        </div>
-      </div>
-
-      <div className="row">
-        <div className="col text-left">
-          <button type="button" className="btn btn-primary" onClick={massUpload}>Mass Upload</button>
-        </div>
-      </div>
+      <table className="table table-hover table-striped" id="activities">
+        <thead>
+          <tr>
+            <th scope="col">Salesforce Name</th>
+            <th scope="col">Challenge Id</th>
+            <th scope="col">Upload</th>
+          </tr>
+        </thead>
+        <tbody>
+          {clientsFromCsv ? renderClients() : <tr />}
+        </tbody>
+      </table>
 
       <Footer />
 

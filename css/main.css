@@ -2,10 +2,6 @@ body {
   color: #554E49;
 }
 
-.row {
-  margin-bottom: 3em;
-}
-
 #header {
   text-align: center;
   margin: 2em 0;
@@ -26,6 +22,10 @@ body {
   display: none;
 }
 
-.alert-success {
-  overflow: hidden;
+.table td, .table th {
+  vertical-align: middle;
+}
+
+.table a {
+  color: inherit;
 }
