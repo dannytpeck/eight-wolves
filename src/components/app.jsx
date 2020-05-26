@@ -15,47 +15,7 @@ function clientsReducer(state, action) {
 /* globals $ */
 function App() {
   const [selectedClient, setSelectedClient] = useState(null);
-  const [activities, setActivities] = useState([]);
-
-  const [startDate, setStartDate] = useState('2020-05-22');
-  const [endDate, setEndDate] = useState('2020-07-01');
-
-  const [challengeId, setChallengeId] = useState(null); // adding this in case we use the app for updating tiles. Could be fancy.
-  const [imageUrl, setImageUrl] = useState('https://images.limeade.com/PDW/805d6a9d-186e-4462-8fe2-ca97a478ffca-large.jpg');
-  const [title, setTitle] = useState('Uploaded from Eight Wolves');
-  const [activityText, setActivityText] = useState('test the upload');
-  const [shortDescription, setShortDescription] = useState('Test upload from Eight Wolves.');
-  const [longDescription, setLongDescription] = useState('<p>So many wolves.</p>');
-
-  // TODO: add remaining state variables
-  const [allowSelfReport, setAllowSelfReport] = useState(0);
-  const [challengeTarget, setChallengeTarget] = useState(1);
-  const [challengeType, setChallengeType] = useState('OneTimeEvent');
-  const [displayPriority, setDisplayPriority] = useState(null);
-  const [enableDeviceTracking, setEnableDeviceTracking] = useState(0);
-  const [eventCode, setEventCode] = useState(null); // adding this in case we ever need it
-
-  const [isFeatured, setIsFeatured] = useState(0);
-  const [isWeekly, setIsWeekly] = useState(0);
-
-  const [isTeamChallenge, setIsTeamChallenge] = useState(0);
-  const [minTeamSize, setMinTeamSize] = useState('');
-  const [maxTeamSize, setMaxTeamSize] = useState('');
-
-  const [partnerId, setPartnerId] = useState(0);
-
-  const [pointValue, setPointValue] = useState(0);
-
-  // Targeting state values
-  const [subgroup, setSubgroup] = useState(null);
-  const [field1, setField1] = useState(null);
-  const [field1Value, setField1Value] = useState(null);
-  const [field2, setField2] = useState(null);
-  const [field2Value, setField2Value] = useState(null);
-  const [field3, setField3] = useState(null);
-  const [field3Value, setField3Value] = useState(null);
-
-
+  const [clientsFromCsv, setClientsFromCsv] = useState(null);
 
   const [clients, dispatch] = React.useReducer(
     clientsReducer,
@@ -79,76 +39,14 @@ function App() {
   }, []); // Pass empty array to only run once on mount
 
   function handleClientsCsvFiles(e) {
-    console.log(e);
-    var reader = new FileReader();
+    let reader = new FileReader();
     reader.onload = function() {
-      // Do something with the data
-      var clientsJson = csvToJson(reader.result)[0];
-      console.log(clientsJson);
-
-      // TODO: parse the clients csv and update state
-
-      // TODO: fix issue where it only parses first row in csv
-
+      // Parse the client csv and update state
+      let clientsJson = csvToJson(reader.result);
+      setClientsFromCsv(clientsJson);
     };
-    // start reading the file. When it is done, calls the onload event defined above.
-    reader.readAsBinaryString(document.querySelector('#csv-clients-input').files[0]);
-  }
-
-  function handleChallengesCsvFiles(e) {
-    console.log(e);
-    var reader = new FileReader();
-    reader.onload = function() {
-      // Do something with the data
-      var challengesJson = csvToJson(reader.result)[0];
-      console.log(challengesJson);
-
-      // parse the challenges csv and update the state values
-      setChallengeId(challengesJson.ChallengeId);
-      setChallengeType(challengesJson.ChallengeType);
-      setIsWeekly(challengesJson.IsWeekly);
-      // skipping WinStrategy since the upload doesn't seem to need it
-      setChallengeTarget(challengesJson.Target);
-      setActivityText(challengesJson.Activity);
-      setTitle(challengesJson.ChallengeName);
-      setDisplayPriority(challengesJson.DisplayPriority);
-      setStartDate(challengesJson.StartDate);
-      setEndDate(challengesJson.EndDate);
-      setShortDescription(challengesJson.ShortDescription);
-      setLongDescription(challengesJson.MoreInformation);
-      setImageUrl(challengesJson.ImageUrl);
-      // skipping ShowInProgram since we determine it during upload
-      // skipping RewardType because what is it even
-      setPointValue(challengesJson.Reward);
-      // skipping Dimensions becasue eff 'em
-      // skipping Leaderboard
-      setEnableDeviceTracking(challengesJson.EnableDeviceTracking);
-      setAllowSelfReport(challengesJson.AllowSelfReporting);
-      // skipping DeviceTrackingUnits, not sure where it fits in the upload
-      setIsTeamChallenge(challengesJson.IsTeamChallenge);
-      setMinTeamSize(challengesJson.MinTeamSize);
-      setMaxTeamSize(challengesJson.MaxTeamSize);
-      setSubgroup(challengesJson.Subgroup);
-      setField1(challengesJson.Field1);
-      setField1Value(challengesJson.Field1Value);
-      setField2(challengesJson.Field2);
-      setField2Value(challengesJson.Field2Value);
-      setField3(challengesJson.Field3);
-      setField3Value(challengesJson.Field3Value);
-      // skipping Appearance
-      setPartnerId(challengesJson.IntegrationPartnerId);
-      // skipping ButtonText since we determine it during upload
-      // skipping TargetUrl since we determine it during upload
-      setEventCode(challengesJson.EventCode);
-      // skipping ShowExtendedDescription since we determine it during upload
-      // skipping ActivityTemplateId, what even is that
-      setIsFeatured(challengesJson.IsFeatured);
-      // skippingFeaturedDescription since we determine it during upload
-      // skipping FeaturedImageUrl since we determine it during upload
-
-    };
-    // start reading the file. When it is done, calls the onload event defined above.
-    reader.readAsBinaryString(document.querySelector('#csv-challenges-input').files[0]);
+    // Start reading the file. When it is done, calls the onload event defined above.
+    reader.readAsBinaryString(e.target.files[0]);
   }
 
   // From https://gist.github.com/iwek/7154578#file-csv-to-json-js
@@ -210,109 +108,41 @@ function App() {
     return result;
   }
 
-  function sanitize(code) {
-    let sanitized = code
-      .replace(/\r?\n|\r/g, ' ')     // Strip out carriage returns and newlines
-      .replace(/\u2018/g, '\'')      // Left single quote
-      .replace(/\u2019/g, '\'')      // Right single quote
-      .replace(/\u201C/g, '"')       // Left double quote
-      .replace(/\u201D/g, '"')       // Right double quote
-      .replace(/\u2026/g, '...')     // Ellipsis
-      .replace(/\u2013/g, '&ndash;') // Long dash
-      .replace(/\u2014/g, '&mdash;') // Longer dash
-      .replace(/\u00A9/g, '&copy;');  // Copyright symbol
-    return sanitized;
-  }
-
   function massUpload() {
     // Open the modal
     $('#uploadModal').modal();
 
     let timer = 0;
 
-    // Upload to app clients
+    const accountNamesList = clientsFromCsv.map(client => client['Account: Account Name']);
+
+    // Filter clients by the list of account names in the user uploaded CSV
     const filteredClients = clients.filter(client => {
-      //return client.fields['Has App'] === 'Yes';
-      return client.fields['Has App'] === 'Yes' && client.fields['Uploaded'] !== '1';
+      return accountNamesList.includes(client.fields['Salesforce Name']);
     });
+
+    console.log(filteredClients);
 
     // Set counter based on filteredClients
     $('#counter').html(`<p><span id="finishedUploads">0</span> / ${filteredClients.length}</p>`);
 
-    filteredClients.map(client => {
-      // 4 seconds between ajax requests, because limeade is bad and returns 500 errors if we go too fast
-      // These requests average about 2.6-3.4 seconds but we've seen limeade take up to 4.4s, either way this
-      // guarantees concurrent calls will be rare, which seem to be the source of our woes
-      timer += 4000;
-      setTimeout(() => {
-        uploadChallenge(client);
-      }, timer);
-    });
+    // filteredClients.map(client => {
+    //   // 4 seconds between ajax requests, because limeade is bad and returns 500 errors if we go too fast
+    //   // These requests average about 2.6-3.4 seconds but we've seen limeade take up to 4.4s, either way this
+    //   // guarantees concurrent calls will be rare, which seem to be the source of our woes
+    //   timer += 4000;
+    //   setTimeout(() => {
+    //     uploadChallenge(client);
+    //   }, timer);
+    // });
   }
 
   function uploadChallenge(client) {
     // Open the modal
     $('#uploadModal').modal();
 
-    let frequency = '';
-    if (enableDeviceTracking === 1) {
-      frequency = 'Daily';
-    } else if (isWeekly === 1) {
-      frequency = 'Weekly'; // this order is intentional, since Weekly Steps have Frequency of Weekly
-    } else {
-      frequency = 'None';
-    }
-
-    // most of the time, Activity Type is the activityText, unless it's a weekly units non-device challenge
-    let activityType = '';
-    if (enableDeviceTracking === 1 && isWeekly === 1) {
-      activityType = '';
-    } else {
-      activityType = activityText;
-    }
-    
-    let amountUnit = 'times';
-    switch (enableDeviceTracking) {
-      case 1:
-        if (isWeekly === 0) {
-          amountUnit = 'steps';
-        } else if (isWeekly === 1) {
-          amountUnit = activityText;
-        }
-        break;
-      case 0:
-        amountUnit = 'times';
-        break;
-    }
-
-    // prepping for splitting tags for upload
-    let tagValues1 = [];
-    let tagValues2 = [];
-    let tagValues3 = [];
-
-    // conditionally setting the tags in case there are fewer than 3 targeting columns
-    let tags = [];
-    function makeTags() {
-      field1 ? tags.push({
-        'TagName': field1 ? field1 : '',
-        'TagValues':
-          field1Value ? tagValues1.concat(field1Value.split('|').map(tag => tag.trim())) : '' // splitting tags on the | like Limeade, also trimming out whitespace just in case
-      }) : null;
-      field2 ? tags.push({
-        'TagName': field2 ? field2 : '',
-        'TagValues':
-          field2Value ? tagValues2.concat(field2Value.split('|').map(tag => tag.trim())) : ''
-      }) : null;
-      field3 ? tags.push({
-        'TagName': field3 ? field3 : '',
-        'TagValues':
-          field3Value ? tagValues3.concat(field3Value.split('|').map(tag => tag.trim())) : ''
-      }) : null;
-      return tags;
-    }
-
     const data = {
-      'AboutChallenge': sanitize(longDescription),
+      'AboutChallenge': longDescription,
       'ActivityReward': {
         'Type': 'IncentivePoints',
         'Value': pointValue
@@ -340,7 +170,7 @@ function App() {
       'IsTeamChallenge': isTeamChallenge,
       'Name': title, // ChallengeName in csv
       'PartnerId': partnerId, // IntegrationPartnerId in csv
-      'ShortDescription': sanitize(shortDescription),
+      'ShortDescription': shortDescription,
       'ShowExtendedDescription': partnerId === 1 ? true : false,
       'ShowWeeklyCalendar': false, // not sure what this does, CTRT has this as false
       'StartDate': startDate,
@@ -352,7 +182,7 @@ function App() {
           'Name': '', // let's hope this is optional since How would we know the Subgroup Name?
           'IsImplicit': field1 ? true : false, // not sure what this does. Seems to be true for tags and false for subgroups.
           'IsPHI': false,
-          'Tags': 
+          'Tags':
             field1 ? makeTags() : null
         }
       ] : [], // if no targeting, use an empty array
@@ -447,23 +277,16 @@ function App() {
         </div>
       </div>
 
-      <div className="row mb-1">
-        <div className="col text-left">
-          <h3>Challenge Content</h3>
-          <p id="csv-challenges-import" type="file" name="Import">Import from CSV</p>
-          <input type="file" id="csv-challenges-input" accept="*.csv" onChange={(e) => handleChallengesCsvFiles(e)} />
-        </div>
-      </div>
       <div className="row">
         <div className="col text-left">
-          {/* TODO: add challenge form inputs here */}
+          <button type="button" className="btn btn-primary" id="uploadButton" onClick={() => uploadChallenge(selectedClient)}>Single Upload</button>
+          <img id="spinner" src="images/spinner.svg" />
         </div>
       </div>
 
       <div className="row">
         <div className="col text-left">
-          <button type="button" className="btn btn-primary" id="uploadButton" onClick={() => uploadChallenge(selectedClient)}>Single Upload</button>
-          <img id="spinner" src="images/spinner.svg" />
+          <button type="button" className="btn btn-primary" onClick={massUpload}>Mass Upload</button>
         </div>
       </div>
 
