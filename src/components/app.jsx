@@ -42,14 +42,14 @@ function App() {
   function uploadChallenge(client) {
     const employerName = client.fields['Limeade e='];
 
-    const startDate = '2020-05-04';
-    const endDate = '2020-05-31';
+    const startDate = '2020-06-01';
+    const endDate = '2020-06-30';
     const imageUrl = 'https://images.limeade.com/PDW/4db33758-07f3-434c-9045-da0b5d34c8b7-large.jpg';
-    const title = 'Hot Topic: Balancing Act';
+    const title = 'Hot Topic: Navigating Close Quarters';
     const activityText = 'listen to the latest Hot Topic podcast';
-    const shortDescription = 'Being a parent is hard work. Recently, many parents have been finding themselves in unfamiliar territory. Not only are they shifting to work from home but are also trying to support their kids\' education at home.';
+    const shortDescription = 'While we\'re staying safe at home, you may also be spending a lot of time with roommates, partners, or loved ones. A LOT of time.';
 
-    const surveyId = '78c9c8f4-f0b1-4dc8-931b-fe1495b38af8';
+    const surveyId = 'd2987e85-4147-4475-9e85-136c0926fcbf';
 
     const data = {
       'AboutChallenge': '',
@@ -98,7 +98,7 @@ function App() {
         type: 'PUT',
         dataType: 'json',
         data: JSON.stringify({
-          'AboutChallenge': `<p>In this month's Hot Topic podcast, our host Coach Molly Pracht and mom and entrepreneur Kim Murgatroyd share some unique insight into home education, including how to build a routine that is fun and can help keep stress low for your whole family.</p><hr size="1" /><h2 style="text-align: center;">Listen to the episode <a href="https://vimeo.com/adurolife/review/408170538/2a86f6c89b" target="_blank" rel="noopener"><span style="text-decoration: underline;">HERE</span></a>.</h2><hr size="1" /><p style="text-align: center;">After the podcast, be sure to fill out <a href="${surveyUrl}" target="_blank" rel="noopener"><span style="text-decoration: underline;"><strong>the survey</strong></span></a>.<br />We'd love to hear from you!</p>`
+          'AboutChallenge': `<p>In this month's Hot Topic podcast, our host Coach Molly Pracht and Behavioral Health Coach Amy Holan share some some red flags to look out for in your relationships, as well as tools to improve communication and foster harmony at home.</p><hr size="1" /><h2 style="text-align: center;">Listen to the episode <a href="https://vimeo.com/adurolife/review/418612651/d3370be915" target="_blank"><span style="text-decoration: underline;">HERE</span></a>.</h2><hr size="1" /><p style="text-align: center;">After the podcast, be sure to fill out <span style="text-decoration: underline;"><strong><a href="${surveyUrl}" target="_blank">the survey</a></strong></span>.<br />We'd love to hear from you!</p>`
         }),
         headers: {
           Authorization: 'Bearer ' + client.fields['LimeadeAccessToken']
