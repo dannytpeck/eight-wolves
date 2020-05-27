@@ -1,14 +1,14 @@
 {
-  "name": "custom-request-loader",
+  "name": "eight-wolves",
   "version": "1.0.0",
-  "description": "Custom Request Loader",
+  "description": "Eight Wolves",
   "main": "index.js",
-  "repository": "https://github.com/dannytpeck/custom-request-loader",
+  "repository": "https://github.com/arapawa/eight-wolves",
   "scripts": {
     "start": "webpack-dev-server --config ./webpack.config.js --mode development",
     "build": "webpack -p --config ./webpack.config.js --progress --colors"
   },
-  "author": "Danny Peck",
+  "author": "Josh Braun, Danny Peck",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.4.3",
