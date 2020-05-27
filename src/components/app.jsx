@@ -106,7 +106,8 @@ function App() {
         contentType: 'application/json; charset=utf-8'
       }).done((result) => {
 
-        // Change row to green on success
+        // Change row to green on success (and remove red if present)
+        $('#' + employerName.replace(/\s*/g, '')).removeClass('bg-danger');
         $('#' + employerName.replace(/\s*/g, '')).addClass('bg-success text-white');
         $('#' + employerName.replace(/\s*/g, '') + ' .challenge-id').html(`<a href="${client.fields['Domain']}/admin/program-designer/activities/activity/${result.Data.ChallengeId}" target="_blank">${result.Data.ChallengeId}</a>`);
 
