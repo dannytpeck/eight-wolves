@@ -42,14 +42,14 @@ function App() {
   function uploadChallenge(client) {
     const employerName = client.fields['Limeade e='];
 
-    const startDate = '07/01/2020';
-    const endDate = '07/31/2020';
-    const imageUrl = 'https://images.limeade.com/PDW/4db33758-07f3-434c-9045-da0b5d34c8b7-large.jpg';
-    const title = 'Hot Topic: Navigating Difficult Conversations';
-    const activityText = 'listen to the Hot Topics Podcast';
-    const shortDescription = 'What\'s holding you back from having difficult conversations about topics that matter to you? You\'re not alone - these important conversations are often uncomfortable and inspire strong emotions or defensiveness.';
+    const startDate = '08/17/2020';
+    const endDate = '09/15/2020';
+    const imageUrl = 'https://images.limeade.com/PDW/1a98f76f-86ab-4b1e-b977-95a4caec9a4b-large.jpg';
+    const title = 'Find Your Flourishing Score';
+    const activityText = 'complete the assessment';
+    const shortDescription = 'No matter where you are today, you can always discover opportunities to grow and unlock your potential.';
 
-    const surveyId = 'b96f5af8-2f86-4f49-b42e-5cbc0dd82665';
+    const surveyId = '035d03dd-dcce-405a-9f99-792063189571';
 
     const data = {
       'AboutChallenge': '',
@@ -98,7 +98,7 @@ function App() {
         type: 'PUT',
         dataType: 'json',
         data: JSON.stringify({
-          'AboutChallenge': `<p>It can be hard to hear each other over hurt feelings or anger. However, having these difficult conversations is so important to create positive change.</p><p>In this Hot Topic, host Molly Pracht welcomes Jyotica Barrio, an Aduro Human Performance Coach and founder of Aduro's Diversity, Equity, Inclusion, and Belonging initiatives. Jyotica shares strategies to navigate difficult conversations in ways that foster a deeper connection rather than division, despite your differences.</p><hr size="1" /><h2 style="text-align: center;">Listen to the episode <span style="text-decoration: underline;"><a href="https://vimeo.com/adurolife/review/430544773/139dde9c19" target="_blank" rel="noopener">HERE</a></span>.</h2><hr size="1" /><p style="text-align: center;">After the podcast, be sure to fill out <span style="text-decoration: underline;"><strong><a href="${surveyUrl}" target="_blank" rel="noopener">the survey</a></strong></span>.<br />We'd love to hear from you!</p>`
+          'AboutChallenge': `<p>During times of uncertainty, it's more important than ever to take the opportunity to check-in with yourself. How are you doing? What matters most to you right now?</p><p>This five-minute survey helps us personalize recommendations of paths and activities based on your scores. Making it easier for you to take action on what is meaningful to you right now. Please respond to the questions on a scale from 0 to 10.</p><p>The Flourishing Index was developed by <a href="https://hfh.fas.harvard.edu/" target="_blank" rel="noopener">The Human Flourishing Program</a> at Harvard University. The background and motivation for these items and the flourishing domains can be found in: VanderWeele, T.J. (2017). <a href="https://www.pnas.org/content/114/31/8148" target="_blank" rel="noopener">On the promotion of human flourishing</a>. Proceedings of the National Academy of Sciences, U.S.A., 31:8148-8156.</p><p>You can access your results any time by clicking <a href="${surveyUrl}" target="_blank" rel="noopener">here</a>. After reporting your survey completion, you can find this tile in your History tab.</p><p>The Flourishing Index will be available for you to complete four times each year to provide real-time reflection on your life.</p><p><a href="${surveyUrl}" target="_blank" rel="noopener">CLICK HERE TO GET STARTED</a>.</p>`
         }),
         headers: {
           Authorization: 'Bearer ' + client.fields['LimeadeAccessToken']
@@ -115,14 +115,14 @@ function App() {
         $('#' + employerName.replace(/\s*/g, '')).addClass('bg-danger text-white');
         console.error(request.status);
         console.error(request.responseText);
-        console.log('Update challenge failed for client', client.fields['Limeade e=']);
+        console.error('Update challenge failed for client', client.fields['Limeade e=']);
       });
 
     }).fail((request, status, error) => {
       $('#' + employerName.replace(/\s*/g, '')).addClass('bg-danger text-white');
       console.error(request.status);
       console.error(request.responseText);
-      console.log('Create challenge failed for client ' + client.fields['Limeade e=']);
+      console.error('Create challenge failed for client ' + client.fields['Limeade e=']);
     });
 
   }
@@ -149,6 +149,12 @@ function App() {
     const sortedClients = [...filteredClients];
 
     sortedClients.sort((a, b) => {
+
+      // Send an error if Salesforce Name is missing so we can fix in Airtable
+      if (!a.fields['Salesforce Name']) {
+        console.error('Salesforce Name not found in record', a);
+      }
+
       const nameA = a.fields['Salesforce Name'].toLowerCase();
       const nameB = b.fields['Salesforce Name'].toLowerCase();
       if (nameA < nameB) {
