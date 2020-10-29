@@ -42,14 +42,14 @@ function App() {
   function uploadChallenge(client) {
     const employerName = client.fields['Limeade e='];
 
-    const startDate = '10/01/2020';
-    const endDate = '10/31/2020';
-    const imageUrl = 'https://images.limeade.com/PDW/4db33758-07f3-434c-9045-da0b5d34c8b7-large.jpg';
-    const title = 'Hot Topic: Why Feeling Anger Is Normal, And What To Do About It';
-    const activityText = 'listen to the Hot Topics Podcast';
-    const shortDescription = 'Perhaps it\'s a specific person, a hostile conversation online, or a strong feeling that bubbles up in your chest. Usually, we look at anger in a negative light, as something destructive to push down, or ignore.';
+    const startDate = '11/01/2020';
+    const endDate = '12/28/2020';
+    const imageUrl = 'https://images.limeade.com/PDW/1a98f76f-86ab-4b1e-b977-95a4caec9a4b-large.jpg';
+    const title = 'Find Your Flourishing Score';
+    const activityText = 'complete the assessment';
+    const shortDescription = 'No matter where you are today, you can always discover opportunities to grow and unlock your potential.';
 
-    const surveyId = 'f55689a0-28d1-4a0f-ba33-2f6c2167a8bb';
+    const surveyId = '035d03dd-dcce-405a-9f99-792063189571';
 
     const data = {
       'AboutChallenge': '',
@@ -98,7 +98,7 @@ function App() {
         type: 'PUT',
         dataType: 'json',
         data: JSON.stringify({
-          'AboutChallenge': `<p>Ignoring our anger doesn't work. Feeling anger is as natural as feeling any other emotion. So, what if you could use your anger as a tool instead?</p><p>In this Hot Topic, host Molly Pracht and returning guest Amy Holan take a look at what we can learn from anger, why a <a href="https://cdn.adurolife.com/pjrz/coaching/documents/tip-sheets/Feelings_Wheel.pdf" target="_blank" rel="noopener">feeling wheel</a> can be a useful tool, how to honor your feelings, and how to process them in healthy ways.</p><hr size="1" /><h2 style="text-align: center;">Listen to the episode <span style="text-decoration: underline;"><a href="https://vimeo.com/adurolife/review/457001662/133a032df3" target="_blank" rel="noopener">HERE</a></span>.</h2><hr size="1" /><p style="text-align: center;">After the podcast, be sure to fill out <span style="text-decoration: underline;"><strong><a href="${surveyUrl}" target="_blank" rel="noopener">the survey</a></strong></span>.<br />We'd love to hear from you!</p>`
+          'AboutChallenge': `<p>During times of uncertainty, it's more important than ever to take the opportunity to check-in with yourself. How are you doing? What matters most to you right now?</p><p>This five-minute survey helps us personalize recommendations of paths and activities based on your scores. Making it easier for you to take action on what is meaningful to you right now. Please respond to the questions on a scale from 0 to 10.</p><p>The Flourishing Index was developed by <a href="https://hfh.fas.harvard.edu/" target="_blank" rel="noopener">The Human Flourishing Program</a> at Harvard University. The background and motivation for these items and the flourishing domains can be found in: VanderWeele, T.J. (2017). <a href="https://www.pnas.org/content/114/31/8148" target="_blank" rel="noopener">On the promotion of human flourishing</a>. Proceedings of the National Academy of Sciences, U.S.A., 31:8148-8156.</p><p>You can access your results any time by clicking <a href="${surveyUrl}" target="_blank" rel="noopener">here</a>. After reporting your survey completion, you can find this tile in your History tab.</p><p>The Flourishing Index will be available for you to complete four times each year to provide real-time reflection on your life.</p><p><a href="${surveyUrl}" target="_blank" rel="noopener">CLICK HERE TO GET STARTED</a>.</p>`
         }),
         headers: {
           Authorization: 'Bearer ' + client.fields['LimeadeAccessToken']
