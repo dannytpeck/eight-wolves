@@ -42,14 +42,14 @@ function App() {
   function uploadChallenge(client) {
     const employerName = client.fields['Limeade e='];
 
-    const startDate = '11/01/2020';
-    const endDate = '12/28/2020';
-    const imageUrl = 'https://images.limeade.com/PDW/1a98f76f-86ab-4b1e-b977-95a4caec9a4b-large.jpg';
-    const title = 'Find Your Flourishing Score';
-    const activityText = 'complete the assessment';
-    const shortDescription = 'No matter where you are today, you can always discover opportunities to grow and unlock your potential.';
+    const startDate = '11/02/2020';
+    const endDate = '11/30/2020';
+    const imageUrl = 'https://images.limeade.com/PDW/4db33758-07f3-434c-9045-da0b5d34c8b7-large.jpg';
+    const title = 'Hot Topic: Tune Out and Tune In';
+    const activityText = 'listen to the Hot Topics Podcast';
+    const shortDescription = 'We are experiencing a lot right now. Every week seems to bring something new for us to work through or worry about. It\'s easy to get pulled down by information coming at us from every direction. Learn about the power we all have to tune out of the things that hijack your energy, and tune in to what your body and mind really need.';
 
-    const surveyId = '035d03dd-dcce-405a-9f99-792063189571';
+    const surveyId = '84feb2c5-de09-4673-adc8-19af60fadb0d';
 
     const data = {
       'AboutChallenge': '',
@@ -98,7 +98,7 @@ function App() {
         type: 'PUT',
         dataType: 'json',
         data: JSON.stringify({
-          'AboutChallenge': `<p>During times of uncertainty, it's more important than ever to take the opportunity to check-in with yourself. How are you doing? What matters most to you right now?</p><p>This five-minute survey helps us personalize recommendations of paths and activities based on your scores. Making it easier for you to take action on what is meaningful to you right now. Please respond to the questions on a scale from 0 to 10.</p><p>The Flourishing Index was developed by <a href="https://hfh.fas.harvard.edu/" target="_blank" rel="noopener">The Human Flourishing Program</a> at Harvard University. The background and motivation for these items and the flourishing domains can be found in: VanderWeele, T.J. (2017). <a href="https://www.pnas.org/content/114/31/8148" target="_blank" rel="noopener">On the promotion of human flourishing</a>. Proceedings of the National Academy of Sciences, U.S.A., 31:8148-8156.</p><p>You can access your results any time by clicking <a href="${surveyUrl}" target="_blank" rel="noopener">here</a>. After reporting your survey completion, you can find this tile in your History tab.</p><p>The Flourishing Index will be available for you to complete four times each year to provide real-time reflection on your life.</p><p><a href="${surveyUrl}" target="_blank" rel="noopener">CLICK HERE TO GET STARTED</a>.</p>`
+          'AboutChallenge': `<p>When we are carrying so much, it is easy to leave behind the activities that restore our strength and energy. We dismiss the things that don't have a "serious" purpose as frivolous and unnecessary. Think about it, when was the last time you intentionally created time to feel free, joyful, Uninhibited? What many of us don't realize, is that those activities in particular are what charge your batteries.<br /><br />In this episode of Hot Topics, host Molly talks with Janssen Judge about the power we all hold to tune out of the stuff that hijacks your energy, and tune in to what your body and mind really need. Janssen is a senior coach on Aduro's Human Performance coaching team, holds a master's degree in Positive Psychology and is a professional board certified coach.</p><hr size="1" /><h2 style="text-align: center;">Listen to the episode <span style="text-decoration: underline;"><a href="https://vimeo.com/adurolife/review/468690631/87020ef257" target="_blank" rel="noopener">HERE</a></span>.</h2><hr size="1" /><p style="text-align: center;">After the podcast, be sure to fill out <a href="${surveyUrl}" target="_blank" rel="noopener"><span style="text-decoration: underline;"><strong>the survey</strong></span>.</a><br />We'd love to hear from you!</p>`
         }),
         headers: {
           Authorization: 'Bearer ' + client.fields['LimeadeAccessToken']
